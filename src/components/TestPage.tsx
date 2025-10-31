@@ -65,7 +65,6 @@ export default function TestPage({ params }: TestPageProps) {
   const { module, unit } = unitData;
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
-  const hasAnsweredCurrent = userAnswers.hasOwnProperty(currentQuestionIndex);
 
   const handleAnswer = (answer: string) => {
     setUserAnswers(prev => ({
