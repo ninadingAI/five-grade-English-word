@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug</title>
+</head>
+<body>
+    <h1>Debug Info</h1>
+    <div id="output"></div>
+    
+    <script>
+        // 测试数据获取
+        fetch('/api/test')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('output').innerHTML = data;
+            })
+            .catch(error => {
+                document.getElementById('output').innerHTML = 'Error: ' + error;
+            });
+    </script>
+</body>
+</html>
