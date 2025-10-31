@@ -20,7 +20,65 @@ export default function ListenAndChoose({
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioError, setAudioError] = useState('');
   const [audioSupported, setAudioSupported] = useState(true);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  const playAudio = async () => {
+    if (!('speechSynthesis' in window)) {
+      setAudioError('您的浏览器不支持语音播放功能');
+      setAudioSupported(false);
+      return;
+    }
+
+    try {
+      setIsPlaying(true);
+      setAudioError('');
+
+      // 使用新的音频播放器
+      const { audioPlayer } = await import('@/utils/audioPlayer');
+      
+      await audioPlayer.speak(question.word.english, {
+        rate: 0.6,
+        volume: 1.0,
+        pitch: 1.0
+      });
+      
+      console.log(`ListenAndChoose: 成功播放单词 "${question.word.english}"`);
+      setHasPlayedAudio(true);
+      
+    } catch (error) {
+      console.error('ListenAndChoose: 音频播放失败:', error);
+      setAudioError('音频播放失败，请重试');
+      
+      // 备用方案
+      try {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(question.word.english);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.6;
+        utterance.volume = 1.0;
+        
+        utterance.onend = () => {
+          setHasPlayedAudio(true);
+          setIsPlaying(false);
+        };
+        
+        utterance.onerror = () => {
+          setAudioError('音频播放失败');
+          setIsPlaying(false);
+        };
+        
+        speechSynthesis.speak(utterance);
+        
+      } catch (fallbackError) {
+        console.error('ListenAndChoose: 备用播放也失败:', fallbackError);
+        setAudioError('音频功能暂时不可用');
+      }
+      
+    } finally {
+      setTimeout(() => {
+        setIsPlaying(false);
+      }, 2000);
+    }
+  };
 
   // 检查音频支持
   useEffect(() => {
@@ -38,7 +96,7 @@ export default function ListenAndChoose({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [question.word.english]);
+  }, [question.word.english, hasPlayedAudio]);
 
   // 清理语音
   useEffect(() => {

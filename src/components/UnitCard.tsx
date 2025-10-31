@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Unit, Module } from '@/types';
+import { Unit, Module, UserProgress } from '@/types';
 import { calculateProgress, getUnitProgress } from '@/utils/progress';
 import { useRouter } from 'next/navigation';
 
@@ -13,10 +13,10 @@ interface UnitCardProps {
 export default function UnitCard({ module, unit }: UnitCardProps) {
   const router = useRouter();
   const [progress, setProgress] = useState(0);
-  const [userProgress, setUserProgress] = useState({ 
+  const [userProgress, setUserProgress] = useState<UserProgress>({ 
     unitId: unit.id,
-    learnedWords: [], 
-    completedTests: [], 
+    learnedWords: [] as string[], 
+    completedTests: [] as string[], 
     stars: 0, 
     lastStudiedAt: new Date() 
   });
